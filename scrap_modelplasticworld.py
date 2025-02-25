@@ -108,7 +108,7 @@ from git import Repo
 csv_file = 'productos.csv'
 repo_url = 'https://github.com/Antonio4132/webs_scrapper.git'  # URL de tu repositorio
 token = os.getenv('GITHUB_TOKEN')  # Reemplaza esto con tu token de GitHub
-repo_dir = '/content/mi_repo'  # Ruta donde clonarás el repositorio
+repo_dir = 'mi_repo/'  # Ruta donde clonarás el repositorio
 
 # Cargar el CSV de productos
 df_final = pd.read_csv(csv_file)
