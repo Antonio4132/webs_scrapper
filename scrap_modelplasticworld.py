@@ -95,7 +95,7 @@ df_extraidos = pd.DataFrame([extraer_datos_producto(url) for url in df["URL"]])
 df_extraidos = df_extraidos.drop(columns=['Nombre'])
 df_final = df.merge(df_extraidos, on="URL",how="inner")
 # Guardar en un CSV
-df_final.to_csv("productos.csv", index=False)
+df_final.to_csv("/var/data/productos.csv", index=False)
 
 # Mostrar los primeros registros
 print(df_final.head())
