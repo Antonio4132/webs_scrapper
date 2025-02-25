@@ -3,3 +3,4 @@ plotly
 requests
 gitpython
 bs4
+flask
