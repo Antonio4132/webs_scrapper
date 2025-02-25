@@ -95,7 +95,60 @@ df_extraidos = pd.DataFrame([extraer_datos_producto(url) for url in df["URL"]])
 df_extraidos = df_extraidos.drop(columns=['Nombre'])
 df_final = df.merge(df_extraidos, on="URL",how="inner")
 # Guardar en un CSV
-df_final.to_csv("/var/data/productos.csv", index=False)
 
 # Mostrar los primeros registros
 print(df_final.head())
+
+import os
+import shutil
+import pandas as pd
+from git import Repo
+
+# Define el nombre de tu archivo CSV y el repositorio de GitHub
+csv_file = 'productos.csv'
+repo_url = 'https://github.com/Antonio4132/webs_scrapper.git'  # URL de tu repositorio
+token = os.getenv('GITHUB_TOKEN')  # Reemplaza esto con tu token de GitHub
+repo_dir = '/content/mi_repo'  # Ruta donde clonarás el repositorio
+
+# Cargar el CSV de productos
+df_final = pd.read_csv(csv_file)
+
+# Aquí podrías agregar o modificar el dataframe si lo deseas
+
+# Guarda el CSV actualizado en el entorno de Colab
+df_final.to_csv(csv_file, index=False)
+
+# Clonar el repositorio en Colab (si no existe ya)
+if not os.path.exists(repo_dir):
+    print(f"Clonando el repositorio en {repo_dir}...")
+    Repo.clone_from(repo_url, repo_dir)
+
+# Verificar si el archivo ya está en el repositorio
+csv_dest = os.path.join(repo_dir, csv_file)
+if os.path.abspath(csv_file) != os.path.abspath(csv_dest):
+    # Copiar el archivo CSV al directorio del repositorio clonado solo si no es el mismo
+    shutil.copy(csv_file, csv_dest)
+else:
+    print("El archivo CSV ya está en el directorio del repositorio.")
+
+# Acceder al repositorio clonado
+repo = Repo(repo_dir)
+
+# Verificar que el directorio contiene un repositorio de git
+if repo.bare:
+    print("El repositorio está vacío o no es válido.")
+else:
+    # Añadir el archivo CSV actualizado al índice de Git
+    index = repo.index
+    index.add([csv_file])  # Ahora se encuentra en el directorio correcto
+
+    # Realiza el commit con un mensaje
+    commit_message = 'Actualización automática del archivo productos.csv'
+    index.commit(commit_message)
+
+    # Pushea los cambios al repositorio en GitHub usando HTTPS y el token
+    origin = repo.remotes.origin
+    origin.set_url(f'https://{token}@github.com/Antonio4132/webs_scrapper.git')  # Usando token para autenticación
+    origin.push()
+
+    print("Archivo CSV actualizado y enviado a GitHub.")
